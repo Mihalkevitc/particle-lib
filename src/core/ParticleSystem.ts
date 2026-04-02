@@ -91,6 +91,9 @@ export class ParticleSystem {
     
     let particleConfig: ParticleConfig = config.config!;
     this.createParticles(particleConfig);
+
+    console.log('Initializing with behavior:', particleConfig.behavior);
+    console.log('Behavior params:', particleConfig.behaviorParams);
     
     if (particleConfig.behavior) {
       this.setBehavior(particleConfig.behavior, particleConfig.behaviorParams);

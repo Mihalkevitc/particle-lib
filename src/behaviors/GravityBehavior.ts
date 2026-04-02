@@ -34,7 +34,7 @@ export class GravityBehavior implements IBehavior {
   }
 
   apply(particles: Particle[]): void {
-    // Если нет активного центра — ничего не делаем, частицы летят по инерции
+    // Если нет активного центра - ничего не делаем, частицы летят по инерции
     if (this.centerX === null || this.centerY === null) return;
 
     for (const p of particles) {
