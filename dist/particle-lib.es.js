@@ -25,7 +25,7 @@ class f {
     }
   }
 }
-class y {
+class x {
   constructor(i = 4) {
     this.speed = i;
   }
@@ -121,23 +121,23 @@ class S {
       }
   }
 }
-let x = 0;
-class B {
+let y = 0;
+class b {
   // Максимальная скорость частиц
   constructor(i = 0.8, t = 0.015, s = 0.03, e = 3) {
     this.amplitude = i, this.frequency = t, this.speed = s, this.maxSpeed = e;
   }
   apply(i) {
-    x += this.speed;
+    y += this.speed;
     for (const t of i) {
-      let s = Math.sin(t.y * this.frequency + x) * this.amplitude, e = Math.cos(t.x * this.frequency + x * 0.5) * this.amplitude;
+      let s = Math.sin(t.y * this.frequency + y) * this.amplitude, e = Math.cos(t.x * this.frequency + y * 0.5) * this.amplitude;
       t.vx += s, t.vy += e;
       const n = Math.hypot(t.vx, t.vy);
       n > this.maxSpeed && (t.vx = t.vx / n * this.maxSpeed, t.vy = t.vy / n * this.maxSpeed);
     }
   }
 }
-class b {
+class B {
   constructor(i = 150, t = 10, s = 0.99) {
     this.explosionX = null, this.explosionY = null, this.explosionTimer = 0, this.explosionStrength = 0, this.explosionRadius = i, this.explosionDuration = t, this.damping = s;
   }
@@ -164,13 +164,16 @@ class M {
   constructor(i) {
     this.apiUrl = i;
   }
+  setApiUrl(i) {
+    this.apiUrl = i;
+  }
   loadLocal(i) {
     return i;
   }
   async loadRemote(i) {
     if (!this.apiUrl)
       throw new Error("API URL is not configured");
-    const t = await fetch(`${this.apiUrl}/presets/${i}`);
+    const t = await fetch(`${this.apiUrl}/presets/public/${i}`);
     if (!t.ok)
       throw new Error(`Failed to load preset: ${t.statusText}`);
     return (await t.json()).config;
@@ -187,13 +190,18 @@ class C {
         this.lastTimestamp = i;
       }
       i - this.lastFpsUpdate >= 1e3 && (this.actualFps = this.frameCount, this.frameCount = 0, this.lastFpsUpdate = i), this.animationId = requestAnimationFrame(this.animate);
-    }, this.behavior = new y(), this.configLoader = new M();
+    }, this.behavior = new x(), this.configLoader = new M();
   }
   setTargetFps(i) {
     this.targetFps = Math.max(15, Math.min(120, i)), this.frameInterval = 1e3 / this.targetFps;
   }
   getActualFps() {
     return this.actualFps;
+  }
+  async initWithPreset(i, t, s) {
+    s != null && s.apiUrl && this.configLoader.setApiUrl(s.apiUrl);
+    const e = await this.configLoader.loadRemote(t);
+    return this.init({ canvas: i, config: e });
   }
   async init(i) {
     if (i.canvas)
@@ -277,7 +285,7 @@ class C {
         );
         break;
       case "wave":
-        this.behavior = new B(
+        this.behavior = new b(
           (t == null ? void 0 : t.amplitude) ?? 0.8,
           (t == null ? void 0 : t.frequency) ?? 0.015,
           (t == null ? void 0 : t.speed) ?? 0.03,
@@ -285,7 +293,7 @@ class C {
         );
         break;
       case "explosion":
-        this.explosionBehavior = new b(
+        this.explosionBehavior = new B(
           (t == null ? void 0 : t.radius) ?? 150,
           (t == null ? void 0 : t.duration) ?? 10,
           (t == null ? void 0 : t.damping) ?? 0.99
@@ -293,7 +301,7 @@ class C {
         break;
       case "followMouse":
       default:
-        this.behavior = new y((t == null ? void 0 : t.speed) ?? 2);
+        this.behavior = new x((t == null ? void 0 : t.speed) ?? 2);
         break;
     }
   }
@@ -340,8 +348,8 @@ class z {
 }
 export {
   M as ConfigLoader,
-  b as ExplosionBehavior,
-  y as FollowMouseBehavior,
+  B as ExplosionBehavior,
+  x as FollowMouseBehavior,
   p as GravityBehavior,
   w as MagneticFieldBehavior,
   f as Particle,
@@ -349,5 +357,5 @@ export {
   z as Renderer,
   g as RepulseBehavior,
   S as VortexBehavior,
-  B as WaveBehavior
+  b as WaveBehavior
 };

@@ -6,14 +6,18 @@ export interface ParticleConfig {
   behavior: string;
   behaviorParams?: Record<string, any>;
   isPublic?: boolean;
-  shape?: string;      // 'square', 'circle', 'triangle'
-  initSpeed?: number;  // начальная скорость частиц
+  shape?: string;
+  initSpeed?: number;
 }
 
 export class ConfigLoader {
   private apiUrl?: string;
 
   constructor(apiUrl?: string) {
+    this.apiUrl = apiUrl;
+  }
+
+  setApiUrl(apiUrl: string): void {
     this.apiUrl = apiUrl;
   }
 
@@ -26,7 +30,7 @@ export class ConfigLoader {
       throw new Error('API URL is not configured');
     }
     
-    const response = await fetch(`${this.apiUrl}/presets/${presetId}`);
+    const response = await fetch(`${this.apiUrl}/presets/public/${presetId}`);
     if (!response.ok) {
       throw new Error(`Failed to load preset: ${response.statusText}`);
     }

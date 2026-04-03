@@ -31,7 +31,6 @@ export class ParticleSystem {
   private explosionBehavior: ExplosionBehavior | null = null;
   private canvasBgColor: string = 'black';
   
-  // FPS контроль
   private targetFps: number = 60;
   private lastTimestamp: number = 0;
   private frameInterval: number = 1000 / 60;
@@ -53,6 +52,19 @@ export class ParticleSystem {
     return this.actualFps;
   }
 
+  async initWithPreset(
+    canvas: HTMLCanvasElement, 
+    presetId: string, 
+    options?: { apiUrl?: string }
+  ): Promise<void> {
+    if (options?.apiUrl) {
+      this.configLoader.setApiUrl(options.apiUrl);
+    }
+    
+    const config = await this.configLoader.loadRemote(presetId);
+    return this.init({ canvas, config });
+  }
+
   async init(config: ParticleSystemConfig): Promise<void> {
     if (config.canvas) {
       this.canvas = config.canvas;
@@ -64,12 +76,9 @@ export class ParticleSystem {
       throw new Error('Either canvasId or canvas element must be provided');
     }
 
-    // НЕ применяем стили, если canvas уже имеет родителя с правильным позиционированием
-    // Проверяем, не является ли canvas уже частью существующего DOM с нужными стилями
     const hasParentContainer = this.canvas.parentElement !== document.body;
     
     if (!hasParentContainer) {
-      // Только если canvas добавлен напрямую в body, применяем центрирование
       this.canvas.style.position = 'absolute';
       this.canvas.style.top = '50%';
       this.canvas.style.left = '50%';
@@ -82,7 +91,6 @@ export class ParticleSystem {
     
     this.canvas.style.border = '1px solid black';
     
-    // НЕ изменяем размер canvas автоматически, если он уже имеет размеры
     if (!hasParentContainer) {
       this.resizeCanvas();
     }
@@ -91,9 +99,6 @@ export class ParticleSystem {
     
     let particleConfig: ParticleConfig = config.config!;
     this.createParticles(particleConfig);
-
-    console.log('Initializing with behavior:', particleConfig.behavior);
-    console.log('Behavior params:', particleConfig.behaviorParams);
     
     if (particleConfig.behavior) {
       this.setBehavior(particleConfig.behavior, particleConfig.behaviorParams);
